@@ -47,26 +47,22 @@ String getFileNames() {
     File entry;
     File root = SD.open("/");
     root.rewindDirectory(); 
-    uint8_t i = 0;
+    
     String FileName = "";
-    while (true) { 
-    entry =  root.openNextFile();
-     if (!entry) {
-      root.close();
-      return FileName;
-    }
-    if (((String)entry.name()).endsWith(".WAV")) {
-      if (fileSelect == i) {
-        FileName = entry.name();
-        entry.close();
-        root.close();
-        return FileName;
+    for (uint8_t i = 0; fileSelect != i; ) { 
+        entry =  root.openNextFile();
+        if (!entry) {
+            break;
         }
-      i++;
+        if (((String)entry.name()).endsWith(".WAV")) {
+            FileName = entry.name();
+            ++i;
+        }
+        entry.close();
     }
-    entry.close();
-    }
-  }
+    root.close();
+    return FileName;    
+}
 
 void openFile(String FileName) {
   File root = SD.open(FileName);
