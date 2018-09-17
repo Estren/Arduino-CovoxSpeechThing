@@ -64,12 +64,24 @@ void openFile(String FileName) {
   if (root) {
     Serial.print(FileName);
     Serial.println(" is opened");
-
+   
+    // Define buffer for presumably higher reading speeds
+    const unsigned char BUFFER_SIZE = 100;
+    uint8_t buffer[BUFFER_SIZE];
     // read from the file until there's nothing else in it:
     while (root.available()) {
-      PORTD = root.read();
-      for(int i = 0; i < 89; i++)
-      __asm("nop");
+      buffer = root.read(buffer, BUFFER_SIZE);
+      for (int i = 0; i < BUFFER_SIZE - 1; i++)
+      {
+          PORTD = buffer[i];
+          for(int j = 0; j < 89; j++)
+              __asm("nop");
+      }
+      // Write last byte (may require different delay)
+      PORTD = buffer[BUFFER_SIZE - 1];
+      for(int j = 0; j < 89; j++)
+          __asm("nop");
+      
       if (digitalRead(8) == LOW) {
         delay(300);  
         root.close();
